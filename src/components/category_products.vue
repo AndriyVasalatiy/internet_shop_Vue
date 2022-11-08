@@ -2,8 +2,12 @@
 <div>
 <div v-for="item in options" 
   :key="item" >
-    <input type="checkbox"  :value="item" 
-    @change="ChangeChoose(item)">
+    <input
+      type="radio"
+      :value="item"
+      name="option"
+      @change="ChangeChoose(item)"
+    >
     <label :for="item">{{item}}</label>
     </div>
     </div>
@@ -29,7 +33,6 @@ export default {
   },
 mounted(){
    this.ChangeChoose()
-   console.log(this.options)
 }
 }
 }

@@ -55,7 +55,8 @@ pagination_products,search_by_name, category_products
       total_Size:5,
       curr_Page:1,
       per_Page:4,
-      products: [ 
+      products: [],
+      defaultProducts: [ 
         {name: "adidas",
           cost: "$225",
           color:"yellow",
@@ -289,48 +290,58 @@ pagination_products,search_by_name, category_products
     };
   },
   methods: {
+    getProducts() {
+      this.products = [...this.defaultProducts];
+    },
+    setPage(newPage) {
+      this.curr_Page=newPage;
+    },
     changeCategory(item){
-     this.currentCategory = item
+     this.currentCategory = item;
+     this.setPage(1);
+     this.filterProducts();
     },
 
         onPageChange(page) {
             this.curr_Page=page
         },
-         updateSearch(newValue){
-    this.search_result = newValue      
+  updateSearch(newValue){
+    this.search_result = newValue;
+    this.setPage(1);
+    this.filterProducts();      
   },
     addItemToCart(product) {
       this.$emit("addItemToCart", product);
     },
     updateNewPage(newValue){
       this.curr_Page=newValue.page;
+    },
+    filteredByCategory(){
+      if (this.currentCategory === 'all') {
+        return;
+      }
+      this.products = this.products.filter(product => product.category === this.currentCategory);
+    },
+    filterBySearch() {
+      if (this.search_result) {
+        this.products = this.products.filter(product => product.name.toLowerCase().indexOf(this.search_result.toLowerCase())!=-1);
+      }
+    },
+    filterProducts() {
+      this.getProducts();
+      this.filteredByCategory();
+      this.filterBySearch();
     }
  },
 computed:{
   filteredList(){
-      return this.searchList.slice((this.curr_Page-1)*this.per_Page,this.curr_Page*this.per_Page)
-    },
-    searchList() {
-      return this.products.filter(product => {
-        return product.name.toLowerCase().indexOf(this.search_result.toLowerCase())!=-1 
-      })
+    const start = (this.curr_Page-1)*this.per_Page;
+    const end = this.curr_Page*this.per_Page;
+    return this.products.slice(start, end);
+  },
 },
-filteredProducts(){
-  if(this.sorted_product.length){
-    return this.sorted_product
-  }
-   return this.products
-  
-},
-filteredByCategory(){
-  if (this.currentCategory === 'all')
-  return this.products 
-  return this.products.filter(product => {
-        return product.category === this.currentCategory
-      }  
-      
-      )
-}
+mounted() {
+  this.getProducts();
 },
  
 }
